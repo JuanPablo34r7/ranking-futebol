@@ -5,7 +5,6 @@
   <title>Tabela Futebol</title>
 
   <style>
-
     .leao {
         width: 100px;
         vertical-align: middle;
@@ -36,6 +35,9 @@
     font-size: 50px;
     align-items:center;
     }
+
+
+
 
     table {
       border-collapse: collapse;
@@ -70,6 +72,46 @@
     .top3 td:nth-child(2){ color: gold; font-weight: bold; }
     .top4 td:nth-child(2){ color: gold; font-weight: bold; }
     .top5 td:nth-child(2){ color: gold; font-weight: bold; }
+
+/*Botões de Filtro */
+
+.filtros{
+        margin: 20px 0;
+    }
+
+    .filtros button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+
+        background: linear-gradient(135deg, #9333ea,#ec4899);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+        transition: all 0.2s ease;
+    }
+
+    .filtros button:hover {
+        transform: scale(1.05);
+        background:  linear-gradient(135deg, #a855f7, #f472b6);
+    }
+
+    .filtros button:active{
+        transform: scale(0.95);
+    }
+
+    .filtros button.ativo 
+    {
+        background: linear-gradient(135deg, #facc15, #f97316);
+        color: black;
+        box-shadow: 0 0 10px rgba(255,204,0,0.6);
+    }
+
   </style>
 </head>
 
@@ -80,6 +122,12 @@
 <img src="https://raw.githubusercontent.com/JuanPablo34r7/ranking-futebol/main/Logo%20Doming%C3%A3o%20a%20Pra%C3%A7a%20e%20Nossa.png"
     class="logo">
 </h1>
+
+<div class="filtros">
+    <button onclick="filtrarTipo('Todos')">Todos</button>
+    <button onclick="filtrarTipo('Jogador')">Jogadores</button>
+    <button onclick="filtrarTipo('Goleiro')">Goleiros</button>
+</div>
 
 <table>
   <thead>
@@ -92,7 +140,7 @@
       <th>🔵</th>
       <th>🟡</th>
       <th>🔴</th>
-      <th>⚽</th>
+      <th id="coluna-extra">⚽</th>
       <th>PTS</th>
     </tr>
   </thead>
@@ -136,7 +184,7 @@ fetch(url)
       if (index < 5) estrela = "⭐."
 
       tabela.innerHTML += `
-        <tr class="${classe}">
+        <tr class="${classe}" data-tipo="${player.Tipo}" data-gols="${player.Gols}" data-defesa="${player.Defesas}">
           <td>${posicao}</td>
           <td>${estrela} ${player.Jogador}</td>
           <td>${player.Vitoria}</td>
@@ -145,11 +193,38 @@ fetch(url)
           <td>${player["C.AZ"]}</td>
           <td>${player["C.AM"]}</td>
           <td>${player["C.VM"]}</td>
-          <td>${player.Gols}</td>
+          <td class="extra">${player.Gols}</td>
           <td>${player.Pontos}</td>
         </tr>
       `;
     });
 
   });
+
+function filtrarTipo(tipo) {
+
+  // remove classe ativo de todos
+  document.querySelectorAll(".filtros button").forEach(btn => {
+    btn.classList.remove("ativo");
+  });
+
+  // adiciona no botão clicado
+  event.target.classList.add("ativo");
+
+  const linhas = document.querySelectorAll("#tabela tr");
+
+  linhas.forEach(linha => {
+    const tipoJogador = linha.getAttribute("data-tipo");
+
+    if (
+      tipo === "Todos" ||
+      tipoJogador.toLowerCase().includes(tipo.toLowerCase())
+    ) {
+      linha.style.display = "";
+    } else {
+      linha.style.display = "none";
+    }
+  });
+}
+
 </script>
