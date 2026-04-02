@@ -203,27 +203,33 @@ fetch(url)
 
 function filtrarTipo(tipo) {
 
-  // remove classe ativo de todos
-  document.querySelectorAll(".filtros button").forEach(btn => {
-    btn.classList.remove("ativo");
-  });
-
-  // adiciona no botão clicado
-  event.target.classList.add("ativo");
-
   const linhas = document.querySelectorAll("#tabela tr");
+  const titulo = document.getElementById("coluna-extra");
 
   linhas.forEach(linha => {
+
     const tipoJogador = linha.getAttribute("data-tipo");
+    const coluna = linha.querySelector(".extra");
 
     if (
       tipo === "Todos" ||
       tipoJogador.toLowerCase().includes(tipo.toLowerCase())
     ) {
       linha.style.display = "";
+
+      // 🔥 TROCA VALOR DA COLUNA
+      if (tipo === "Goleiro") {
+        titulo.innerText = "🧤";
+        coluna.innerText = linha.getAttribute("data-defesa");
+      } else {
+        titulo.innerText = "⚽";
+        coluna.innerText = linha.getAttribute("data-gols");
+      }
+
     } else {
       linha.style.display = "none";
     }
+
   });
 }
 
