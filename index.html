@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tabela Futebol</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin: 20px auto;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+    }
+
+    th {
+      background: #1e293b;
+    }
+
+    tr:nth-child(even) {
+      background: #1e293b;
+    }
+
+    tr:nth-child(odd) {
+      background: #0f172a;
+    }
+
+    .top1 td:nth-child(2){ color: gold; font-weight: bold; }
+    .top2 td:nth-child(2){ color: gold; font-weight: bold; }
+    .top3 td:nth-child(2){ color: gold; font-weight: bold; }
+    .top4 td:nth-child(2){ color: gold; font-weight: bold; }
+    .top5 td:nth-child(2){ color: gold; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+
+<h1>🏆 Ranking Futebol</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Jogador</th>
+      <th>V</th>
+      <th>D</th>
+      <th>E</th>
+      <th>🔵</th>
+      <th>🟡</th>
+      <th>🔴</th>
+      <th>⚽</th>
+      <th>PTS</th>
+    </tr>
+  </thead>
+  <tbody id="tabela"></tbody>
+</table>
+
+<script>
+const url = "https://opensheet.elk.sh/1ZV7VsXLnYkzs4QItWlF8s05NrRxOE-XEbbxOv9mu9o0/dadosPelada";
+
+fetch(url)
+  .then(res => res.json())
+  .then(data => {
+
+    // Ordenar por pontos e gols
+    data.sort((a, b) => {
+        if (b.Pontos !== a.Pontos) {
+            return b.Pontos - a.Pontos; //Primeiro Filtro
+        }
+        return b.Gols - a.Gols; // Desempate
+
+    });
+
+    data = data.slice(0,30);
+
+    const tabela = document.getElementById("tabela");
+
+    data.forEach((player, index) => {
+      let posicao = index +1;
+
+      //Classe Cor
+      let classe = "";
+      if (index === 0) classe = "top1";
+      if (index === 1) classe = "top2";
+      if (index === 2) classe = "top3";
+      if (index === 3) classe = "top4";
+      if (index === 4) classe = "top5";
+
+      //EMOJI
+
+      let estrela = "";
+      if (index < 5) estrela = "⭐."
+
+      tabela.innerHTML += `
+        <tr class="${classe}">
+          <td>${posicao}</td>
+          <td>${estrela} ${player.Jogador}</td>
+          <td>${player.Vitoria}</td>
+          <td>${player.Derrota}</td>
+          <td>${player.Empate}</td>
+          <td>${player["C.AZ"]}</td>
+          <td>${player["C.AM"]}</td>
+          <td>${player["C.VM"]}</td>
+          <td>${player.Gols}</td>
+          <td>${player.Pontos}</td>
+        </tr>
+      `;
+    });
+
+  });
+</script>
