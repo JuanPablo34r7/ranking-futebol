@@ -5,39 +5,61 @@
   <title>Tabela Futebol</title>
 
   <style>
+
+    .leao {
+        width: 200px;
+        vertical-align: middle;
+        margin-right: 0px;
+    }
+
+    .logo {
+        width: 200px;
+        vertical-align: middle;
+        margin-left: 450px;
+    }
     body {
       font-family: Arial;
-      background: #0f172a;
       color: white;
       text-align: center;
+
+      background: url("https://wallpapers.com/images/hd/premier-league-lion-with-crown-xdd2popzj7bzrjt2.jpg");
+      background-size: cover;
+      background-position: center;
     }
 
     h1 {
-      margin-top: 20px;
+    display: flex;
+      margin-top: 10px;
+      font-size: 100px;
+      align-items: center;
     }
 
     table {
       border-collapse: collapse;
-      width: 80%;
+      width: 60%;
       margin: 20px auto;
       border-radius: 10px;
       overflow: hidden;
+      font-size: 20px;
+
+      background: rgba(2, 6, 23, 0.6);
+      backdrop-filter: blur(1px);
     }
 
     th, td {
-      padding: 10px;
+      padding: 20px;
     }
 
     th {
-      background: #1e293b;
+      background: #a302bf;
     }
 
     tr:nth-child(even) {
-      background: #1e293b;
+      background: rgba(84, 84, 84, 0.3);
     }
 
     tr:nth-child(odd) {
-      background: #0f172a;
+      background: rgba(216, 216, 216, 0.3);
     }
 
     .top1 td:nth-child(2){ color: gold; font-weight: bold; }
@@ -50,12 +72,16 @@
 
 <body>
 
-<h1>🏆 Ranking Futebol</h1>
+<h1><img src="https://www.ogol.com.br/img/logos/competicoes/4_imgbank_pl_20250226175331.png" class="leao">
+    <Span>Premier League</Span>
+    <img src="https://raw.githubusercontent.com/JuanPablo34r7/ranking-futebol/main/Logo%20Doming%C3%A3o%20a%20Pra%C3%A7a%20e%20Nossa.png"
+    class="logo">
+</h1>
 
 <table>
   <thead>
     <tr>
-      <th>#</th>
+      <th>N°</th>
       <th>Jogador</th>
       <th>V</th>
       <th>D</th>
