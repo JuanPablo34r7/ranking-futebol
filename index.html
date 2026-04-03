@@ -124,7 +124,7 @@
 </h1>
 
 <div class="filtros">
-    <button onclick="filtrarTipo('Todos')">Todos</button>
+    <button class="ativo" onclick="filtrarTipo('Todos')">Todos</button>
     <button onclick="filtrarTipo('Jogador')">Jogadores</button>
     <button onclick="filtrarTipo('Goleiro')">Goleiros</button>
 </div>
@@ -232,5 +232,16 @@ function filtrarTipo(tipo) {
 
   });
 }
+
+const botoes = document.querySelectorAll(".filtros button");
+
+botoes.forEach(botao => {
+  botao.addEventListener("click",() => {
+    // Remove Ativo de todos
+    botoes.forEach(b => b.classList.remove("ativo"));
+    // Adiciona ativo no botão clicado
+    botao.classList.add("ativo");
+  });
+})
 
 </script>
