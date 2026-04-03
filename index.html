@@ -117,7 +117,7 @@
 
 <body>
 
-<h1><img src="https://www.ogol.com.br/img/logos/competicoes/4_imgbank_pl_20250226175331.png" class="leao">
+  <h1><img src="https://www.ogol.com.br/img/logos/competicoes/4_imgbank_pl_20250226175331.png" class="leao">
 <span>Premier League</span>
 <img src="https://raw.githubusercontent.com/JuanPablo34r7/ranking-futebol/main/Logo%20Doming%C3%A3o%20a%20Pra%C3%A7a%20e%20Nossa.png"
     class="logo">
@@ -148,100 +148,95 @@
 </table>
 
 <script>
+// Dados originais
+let dadosOriginais = [];
+
 const url = "https://opensheet.elk.sh/1ZV7VsXLnYkzs4QItWlF8s05NrRxOE-XEbbxOv9mu9o0/dadosPelada";
 
 fetch(url)
   .then(res => res.json())
   .then(data => {
-
-    // Ordenar por pontos e gols
-    data.sort((a, b) => {
-        if (b.Pontos !== a.Pontos) {
-            return b.Pontos - a.Pontos; //Primeiro Filtro
-        }
-        return b.Gols - a.Gols; // Desempate
-
-    });
-
-    data = data.slice(0,30);
-
-    const tabela = document.getElementById("tabela");
-
-    data.forEach((player, index) => {
-      let posicao = index +1;
-
-      //Classe Cor
-      let classe = "";
-      if (index === 0) classe = "top1";
-      if (index === 1) classe = "top2";
-      if (index === 2) classe = "top3";
-      if (index === 3) classe = "top4";
-      if (index === 4) classe = "top5";
-
-      //EMOJI
-
-      let estrela = "";
-      if (index < 5) estrela = "⭐."
-
-      tabela.innerHTML += `
-        <tr class="${classe}" data-tipo="${player.Tipo}" data-gols="${player.Gols}" data-defesa="${player.Defesas}">
-          <td>${posicao}</td>
-          <td>${estrela} ${player.Jogador}</td>
-          <td>${player.Vitoria}</td>
-          <td>${player.Derrota}</td>
-          <td>${player.Empate}</td>
-          <td>${player["C.AZ"]}</td>
-          <td>${player["C.AM"]}</td>
-          <td>${player["C.VM"]}</td>
-          <td class="extra">${player.Gols}</td>
-          <td>${player.Pontos}</td>
-        </tr>
-      `;
-    });
-
+    dadosOriginais = data;
+    carregarTabela("Todos");
   });
 
-function filtrarTipo(tipo) {
+function carregarTabela(tipoSelecionado) {
+  let dadosFiltrados = [...dadosOriginais];
 
-  const linhas = document.querySelectorAll("#tabela tr");
-  const titulo = document.getElementById("coluna-extra");
+  // Filtragem
+  if (tipoSelecionado === "Jogador") {
+    dadosFiltrados = dadosFiltrados.filter(p => 
+      p.Tipo && p.Tipo.toLowerCase().includes("jogador")
+    );
+  } else if (tipoSelecionado === "Goleiro") {
+    dadosFiltrados = dadosFiltrados.filter(p => 
+      p.Tipo && p.Tipo.toLowerCase().includes("goleiro")
+    );
+  }
 
-  linhas.forEach(linha => {
-
-    const tipoJogador = linha.getAttribute("data-tipo");
-    const coluna = linha.querySelector(".extra");
-
-    if (
-      tipo === "Todos" ||
-      tipoJogador.toLowerCase().includes(tipo.toLowerCase())
-    ) {
-      linha.style.display = "";
-
-      // 🔥 TROCA VALOR DA COLUNA
-      if (tipo === "Goleiro") {
-        titulo.innerText = "🧤";
-        coluna.innerText = linha.getAttribute("data-defesa");
-      } else {
-        titulo.innerText = "⚽";
-        coluna.innerText = linha.getAttribute("data-gols");
-      }
-
+  // Ordenação
+  dadosFiltrados.sort((a, b) => {
+    if (tipoSelecionado === "Goleiro") {
+      return (Number(a.GolsSofridos) || 0) - (Number(b.GolsSofridos) || 0);
     } else {
-      linha.style.display = "none";
-    }
+      const ptsA = Number(a.Pontos) || 0;
+      const ptsB = Number(b.Pontos) || 0;
+      const golsA = Number(a.Gols) || 0;
+      const golsB = Number(b.Gols) || 0;
 
+      if (ptsA !== ptsB) return ptsB - ptsA;
+      return golsB - golsA;
+    }
   });
+
+  dadosFiltrados = dadosFiltrados.slice(0, 30);
+
+  // Monta a tabela
+  const tabela = document.getElementById("tabela");
+  tabela.innerHTML = "";
+
+  dadosFiltrados.forEach((player, index) => {
+    let posicao = index + 1;
+    let classe = index < 5 ? `top${index+1}` : "";
+    let estrela = index < 5 ? "⭐ " : "";
+
+    // 🔥 Aqui está a correção principal
+    const valorColunaExtra = (tipoSelecionado === "Goleiro") 
+      ? (player.GolsSofridos || 0) 
+      : (player.Gols || 0);
+
+    tabela.innerHTML += `
+      <tr class="${classe}" data-tipo="${player.Tipo || ''}" 
+          data-gols="${player.Gols || 0}" 
+          data-golssofridos="${player.GolsSofridos || 0}">
+        <td>${posicao}</td>
+        <td>${estrela}${player.Jogador}</td>
+        <td>${player.Vitoria || 0}</td>
+        <td>${player.Derrota || 0}</td>
+        <td>${player.Empate || 0}</td>
+        <td>${player["C.AZ"] || 0}</td>
+        <td>${player["C.AM"] || 0}</td>
+        <td>${player["C.VM"] || 0}</td>
+        <td class="extra">${valorColunaExtra}</td>
+        <td>${player.Pontos || 0}</td>
+      </tr>
+    `;
+  });
+
+  // Troca o título da coluna
+  document.getElementById("coluna-extra").innerText = (tipoSelecionado === "Goleiro") ? "🥅" : "⚽";
 }
 
-const botoes = document.querySelectorAll(".filtros button");
+function filtrarTipo(tipo) {
+  carregarTabela(tipo);
+}
 
-botoes.forEach(botao => {
-  botao.addEventListener("click",() => {
-    // Remove Ativo de todos
-    botoes.forEach(b => b.classList.remove("ativo"));
-    // Adiciona ativo no botão clicado
+// Ativar botão visual
+document.querySelectorAll(".filtros button").forEach(botao => {
+  botao.addEventListener("click", () => {
+    document.querySelectorAll(".filtros button").forEach(b => b.classList.remove("ativo"));
     botao.classList.add("ativo");
   });
-})
+});
 
 </script>
