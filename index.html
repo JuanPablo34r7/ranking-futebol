@@ -223,19 +223,22 @@ function carregarTabela(tipoSelecionado) {
     `;
   }
 
-  // Preenche as linhas
+  // Preencher as linhas
   dadosFiltrados.forEach((player, index) => {
     let posicao = index + 1;
     let classe = "";
     let estrela = "";
 
+    //Mostra somente Top1
+    
     if (tipoSelecionado === "Goleiro") {
       if(index === 0){
       classe = "top1";
-      estrela = "🏆";
+      estrela = "🏆 ";
       }
     }
     else{
+      //Para os Jogadores Top5
       if(index === 0) classe = "top1";
       if(index === 1) classe = "top2";
       if(index === 2) classe = "top3";
