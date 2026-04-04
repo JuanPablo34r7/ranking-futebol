@@ -163,7 +163,7 @@ fetch(url)
 function carregarTabela(tipoSelecionado) {
   let dadosFiltrados = [...dadosOriginais];
 
-  // Filtragem
+  // ==================== FILTRAGEM ====================
   if (tipoSelecionado === "Jogador") {
     dadosFiltrados = dadosFiltrados.filter(p => 
       p.Tipo && p.Tipo.toLowerCase().includes("jogador")
@@ -174,19 +174,15 @@ function carregarTabela(tipoSelecionado) {
     );
   }
 
-  // Ordenação
+  // ==================== ORDENAÇÃO ÚNICA ====================
   dadosFiltrados.sort((a, b) => {
-    if (tipoSelecionado === "Goleiro") {
-      return (Number(a.GolsSofridos) || 0) - (Number(b.GolsSofridos) || 0);
-    } else {
-      const ptsA = Number(a.Pontos) || 0;
-      const ptsB = Number(b.Pontos) || 0;
-      const golsA = Number(a.Gols) || 0;
-      const golsB = Number(b.Gols) || 0;
+    const ptsA = Number(a.Pontos) || 0;
+    const ptsB = Number(b.Pontos) || 0;
+    const golsA = Number(a.Gols) || 0;
+    const golsB = Number(b.Gols) || 0;
 
-      if (ptsA !== ptsB) return ptsB - ptsA;
-      return golsB - golsA;
-    }
+    if (ptsA !== ptsB) return ptsB - ptsA;   // Maior Pontos primeiro
+    return golsB - golsA;                     // Desempate: maior Gols
   });
 
   dadosFiltrados = dadosFiltrados.slice(0, 30);
@@ -195,20 +191,45 @@ function carregarTabela(tipoSelecionado) {
   const tabela = document.getElementById("tabela");
   tabela.innerHTML = "";
 
+  const thead = document.querySelector("thead tr");
+  thead.innerHTML = "";   // Limpa cabeçalho
+
+  // Define cabeçalho dinâmico
+  if (tipoSelecionado === "Goleiro") {
+    thead.innerHTML = `
+      <th>N°</th>
+      <th>Jogador</th>
+      <th>V</th>
+      <th>D</th>
+      <th>E</th>
+      <th>🔵</th>
+      <th>🟡</th>
+      <th>🔴</th>
+      <th>PTS</th>
+    `;
+  } else {
+    thead.innerHTML = `
+      <th>N°</th>
+      <th>Jogador</th>
+      <th>V</th>
+      <th>D</th>
+      <th>E</th>
+      <th>🔵</th>
+      <th>🟡</th>
+      <th>🔴</th>
+      <th>⚽</th>
+      <th>PTS</th>
+    `;
+  }
+
+  // Preenche as linhas
   dadosFiltrados.forEach((player, index) => {
     let posicao = index + 1;
     let classe = index < 5 ? `top${index+1}` : "";
     let estrela = index < 5 ? "⭐ " : "";
 
-    // 🔥 Aqui está a correção principal
-    const valorColunaExtra = (tipoSelecionado === "Goleiro") 
-      ? (player.GolsSofridos || 0) 
-      : (player.Gols || 0);
-
-    tabela.innerHTML += `
-      <tr class="${classe}" data-tipo="${player.Tipo || ''}" 
-          data-gols="${player.Gols || 0}" 
-          data-golssofridos="${player.GolsSofridos || 0}">
+    let htmlLinha = `
+      <tr class="${classe}" data-tipo="${player.Tipo || ''}">
         <td>${posicao}</td>
         <td>${estrela}${player.Jogador}</td>
         <td>${player.Vitoria || 0}</td>
@@ -217,14 +238,16 @@ function carregarTabela(tipoSelecionado) {
         <td>${player["C.AZ"] || 0}</td>
         <td>${player["C.AM"] || 0}</td>
         <td>${player["C.VM"] || 0}</td>
-        <td class="extra">${valorColunaExtra}</td>
-        <td>${player.Pontos || 0}</td>
-      </tr>
     `;
-  });
 
-  // Troca o título da coluna
-  document.getElementById("coluna-extra").innerText = (tipoSelecionado === "Goleiro") ? "🥅" : "⚽";
+    if (tipoSelecionado !== "Goleiro") {
+      htmlLinha += `<td>${player.Gols || 0}</td>`;
+    }
+
+    htmlLinha += `<td>${player.Pontos || 0}</td></tr>`;
+
+    tabela.innerHTML += htmlLinha;
+  });
 }
 
 function filtrarTipo(tipo) {
@@ -238,5 +261,4 @@ document.querySelectorAll(".filtros button").forEach(botao => {
     botao.classList.add("ativo");
   });
 });
-
 </script>
