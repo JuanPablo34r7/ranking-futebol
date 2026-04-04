@@ -185,6 +185,7 @@ function carregarTabela(tipoSelecionado) {
     return golsB - golsA;                     // Desempate: maior Gols
   });
 
+  //Mostrar Todos (Limite Atual 30)
   dadosFiltrados = dadosFiltrados.slice(0, 30);
 
   // Monta a tabela
@@ -225,9 +226,24 @@ function carregarTabela(tipoSelecionado) {
   // Preenche as linhas
   dadosFiltrados.forEach((player, index) => {
     let posicao = index + 1;
-    let classe = index < 5 ? `top${index+1}` : "";
-    let estrela = index < 5 ? "⭐ " : "";
+    let classe = "";
+    let estrela = "";
 
+    if (tipoSelecionado === "Goleiro") {
+      if(index === 0){
+      classe = "top1";
+      estrela = "🏆";
+      }
+    }
+    else{
+      if(index === 0) classe = "top1";
+      if(index === 1) classe = "top2";
+      if(index === 2) classe = "top3";
+      if(index === 3) classe = "top4";
+      if(index === 4) classe = "top5";
+      estrela = index < 5 ? "⭐ " : "";
+    }
+    
     let htmlLinha = `
       <tr class="${classe}" data-tipo="${player.Tipo || ''}">
         <td>${posicao}</td>
