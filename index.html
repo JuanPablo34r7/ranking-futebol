@@ -3,8 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>Tabela Futebol</title>
-
   <style>
+
+    .mensagem-fixa {
+    width: 60%;
+    margin: 10px auto;
+    padding: 10px 100px;
+    background: linear-gradient(135deg, #2c0f4770,#631e4096);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 50px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    border: 1px linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+}
+  
+  
     .leao {
         width: 100px;
         vertical-align: middle;
@@ -35,9 +50,6 @@
     font-size: 50px;
     align-items:center;
     }
-
-
-
 
     table {
       border-collapse: collapse;
@@ -86,7 +98,7 @@
         border-radius: 20px;
         cursor: pointer;
 
-        color: white;
+        color: rgb(255, 254, 254);
         font-weight: bold;
         font-size: 14px;
 
@@ -126,9 +138,12 @@
 <div class="filtros">
     <button class="ativo" onclick="filtrarTipo('Todos')">Todos</button>
     <button onclick="filtrarTipo('Jogador')">Jogadores</button>
-    <button onclick="filtrarTipo('Goleiro')">Goleiros</button>
+    <button onclick="filtrarTipo('Goleiro')">Goleiros
+    </button>
 </div>
 
+<table>
+  <thead>
 <table>
   <thead>
     <tr>
@@ -146,6 +161,11 @@
   </thead>
   <tbody id="tabela"></tbody>
 </table>
+
+<!-- MENSAGEM FIXA ACIMA DA TABELA -->
+<div class="mensagem-fixa">
+    ⭐ Melhores Jogadores | 🔴 C.Vermelho | 🟡 C.Amarelo | 🔵 C.Azul | ⚽ Saldo de Gols
+</div>
 
 <script>
 // Dados originais
@@ -165,90 +185,96 @@ function carregarTabela(tipoSelecionado) {
 
   // ==================== FILTRAGEM ====================
   if (tipoSelecionado === "Jogador") {
-    dadosFiltrados = dadosFiltrados.filter(p => 
-      p.Tipo && p.Tipo.toLowerCase().includes("jogador")
-    );
+    dadosFiltrados = dadosFiltrados.filter(p => p.Tipo && p.Tipo.toLowerCase().includes("jogador"));
   } else if (tipoSelecionado === "Goleiro") {
-    dadosFiltrados = dadosFiltrados.filter(p => 
-      p.Tipo && p.Tipo.toLowerCase().includes("goleiro")
-    );
+    dadosFiltrados = dadosFiltrados.filter(p => p.Tipo && p.Tipo.toLowerCase().includes("goleiro"));
   }
 
-  // ==================== ORDENAÇÃO ÚNICA ====================
+  // ==================== SOMAR QUANDO FOR "TODOS" ====================
+  if (tipoSelecionado === "Todos") {
+    const mapa = new Map();
+
+    dadosFiltrados.forEach(player => {
+      const nome = player.Jogador.trim().toUpperCase();
+
+      if (!mapa.has(nome)) {
+        mapa.set(nome, {
+          Jogador: player.Jogador,
+          Pontos: 0,
+          Gols: 0,
+          Vitoria: 0,
+          Derrota: 0,
+          Empate: 0,
+          "C.AZ": 0,
+          "C.AM": 0,
+          "C.VM": 0,
+        });
+      }
+
+      const atual = mapa.get(nome);
+      atual.Pontos  += Number(player.Pontos)  || 0;
+      atual.Gols    += Number(player.Gols)    || 0;
+      atual.Vitoria += Number(player.Vitoria) || 0;
+      atual.Derrota += Number(player.Derrota) || 0;
+      atual.Empate  += Number(player.Empate)  || 0;
+      atual["C.AZ"] += Number(player["C.AZ"]) || 0;
+      atual["C.AM"] += Number(player["C.AM"]) || 0;
+      atual["C.VM"] += Number(player["C.VM"]) || 0;
+    });
+
+    dadosFiltrados = Array.from(mapa.values());
+  }
+
+  // ==================== ORDENAÇÃO ====================
   dadosFiltrados.sort((a, b) => {
     const ptsA = Number(a.Pontos) || 0;
     const ptsB = Number(b.Pontos) || 0;
     const golsA = Number(a.Gols) || 0;
     const golsB = Number(b.Gols) || 0;
 
-    if (ptsA !== ptsB) return ptsB - ptsA;   // Maior Pontos primeiro
-    return golsB - golsA;                     // Desempate: maior Gols
+    if (ptsA !== ptsB) return ptsB - ptsA;
+    return golsB - golsA;
   });
 
-  //Mostrar Todos (Limite Atual 30)
   dadosFiltrados = dadosFiltrados.slice(0, 30);
 
-  // Monta a tabela
+  // Monta tabela
   const tabela = document.getElementById("tabela");
   tabela.innerHTML = "";
 
   const thead = document.querySelector("thead tr");
-  thead.innerHTML = "";   // Limpa cabeçalho
+  thead.innerHTML = "";
 
-  // Define cabeçalho dinâmico
   if (tipoSelecionado === "Goleiro") {
-    thead.innerHTML = `
-      <th>N°</th>
-      <th>Jogador</th>
-      <th>V</th>
-      <th>D</th>
-      <th>E</th>
-      <th>🔵</th>
-      <th>🟡</th>
-      <th>🔴</th>
-      <th>PTS</th>
-    `;
+    thead.innerHTML = `<th>N°</th><th>Goleiro</th><th>V</th><th>D</th><th>E</th><th>🔵</th><th>🟡</th><th>🔴</th><th>PTS</th>`;
   } else {
-    thead.innerHTML = `
-      <th>N°</th>
-      <th>Jogador</th>
-      <th>V</th>
-      <th>D</th>
-      <th>E</th>
-      <th>🔵</th>
-      <th>🟡</th>
-      <th>🔴</th>
-      <th>⚽</th>
-      <th>PTS</th>
-    `;
+    thead.innerHTML = `<th>N°</th><th>Jogador</th><th>V</th><th>D</th><th>E</th><th>🔵</th><th>🟡</th><th>🔴</th><th>⚽</th><th>PTS</th>`;
   }
 
-  // Preencher as linhas
+  // Preenche as linhas
   dadosFiltrados.forEach((player, index) => {
     let posicao = index + 1;
     let classe = "";
     let estrela = "";
 
-    //Mostra somente Top1
-    
     if (tipoSelecionado === "Goleiro") {
-      if(index === 0){
-      classe = "top1";
-      estrela = "🏆 ";
+      // Apenas o melhor goleiro recebe troféu
+      if (index === 0) {
+        classe = "top1";
+        estrela = "🏆 ";
       }
-    }
-    else{
-      //Para os Jogadores Top5
-      if(index === 0) classe = "top1";
-      if(index === 1) classe = "top2";
-      if(index === 2) classe = "top3";
-      if(index === 3) classe = "top4";
-      if(index === 4) classe = "top5";
+    } else {
+      // Top 5 para Jogadores e Todos
+      if (index === 0) classe = "top1";
+      if (index === 1) classe = "top2";
+      if (index === 2) classe = "top3";
+      if (index === 3) classe = "top4";
+      if (index === 4) classe = "top5";
       estrela = index < 5 ? "⭐ " : "";
     }
-    
+
     let htmlLinha = `
-      <tr class="${classe}" data-tipo="${player.Tipo || ''}">
+      <tr class="${classe}">
         <td>${posicao}</td>
         <td>${estrela}${player.Jogador}</td>
         <td>${player.Vitoria || 0}</td>
@@ -273,7 +299,7 @@ function filtrarTipo(tipo) {
   carregarTabela(tipo);
 }
 
-// Ativar botão visual
+// Ativar botão
 document.querySelectorAll(".filtros button").forEach(botao => {
   botao.addEventListener("click", () => {
     document.querySelectorAll(".filtros button").forEach(b => b.classList.remove("ativo"));
